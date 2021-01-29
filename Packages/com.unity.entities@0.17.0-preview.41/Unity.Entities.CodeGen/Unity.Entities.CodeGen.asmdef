@@ -1,0 +1,31 @@
+{
+    "name": "Unity.Entities.CodeGen",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Entities",
+        "Unity.Jobs",
+		"Unity.Properties"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Mono.Cecil.dll",
+        "Mono.Cecil.Rocks.dll",
+        "Mono.Cecil.Pdb.dll",
+		"Unity.IL2CPP",
+		"Unity.IL2CPP.Common"
+    ],
+    "autoReferenced": false,
+    "versionDefines": [
+        {
+            "name": "com.unity.roslyn",
+            "expression": "0.0.0-preview.2",
+            "define": "ROSLYN_SOURCEGEN_ENABLED"
+        }
+    ]
+}

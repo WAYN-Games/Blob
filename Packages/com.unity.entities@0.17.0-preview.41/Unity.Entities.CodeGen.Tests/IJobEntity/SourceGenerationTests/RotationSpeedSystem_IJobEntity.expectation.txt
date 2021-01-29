@@ -1,0 +1,41 @@
+using System.Runtime.CompilerServices;
+using Unity.Entities;
+
+[CompilerGenerated]
+public class RotationSpeedSystem_IJobEntity : SystemBase
+{
+	private EntityQuery __OnUpdateQuery;
+
+	protected override void OnUpdate()
+	{
+		RotateEntityJob rotateEntityJob = default(RotateEntityJob);
+		rotateEntityJob.DeltaTime = base.Time.DeltaTime;
+		RotateEntityJob iJobEntity = rotateEntityJob;
+		base.Entities.OnUpdate(iJobEntity).ScheduleParallel();
+	}
+
+	private void OnUpdate_Patched()
+	{
+		RotateEntityJob rotateEntityJob = default(RotateEntityJob);
+		rotateEntityJob.DeltaTime = base.Time.DeltaTime;
+		RotateEntityJob _JobData = rotateEntityJob;
+		base.Dependency = JobEntityBatchExtensions.ScheduleParallel(new RotateEntityJob_OnUpdate
+		{
+			__JobData = _JobData,
+			__RotationType = GetComponentTypeHandle<Rotation>(),
+			__RotationSpeed_ForEachType = GetComponentTypeHandle<RotationSpeed_ForEach>(isReadOnly: true)
+		}, __OnUpdateQuery, 1, base.Dependency);
+	}
+
+	protected override void OnCreateForCompiler()
+	{
+		__OnUpdateQuery = GetEntityQuery(new EntityQueryDesc
+		{
+			All = new ComponentType[2]
+			{
+				ComponentType.ReadWrite<Rotation>(),
+				ComponentType.ReadOnly<RotationSpeed_ForEach>()
+			}
+		});
+	}
+}

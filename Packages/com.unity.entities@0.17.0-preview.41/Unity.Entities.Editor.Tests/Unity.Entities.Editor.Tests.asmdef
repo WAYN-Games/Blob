@@ -1,0 +1,24 @@
+{
+    "name": "Unity.Entities.Editor.Tests",
+    "references": [
+        "Unity.Collections",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "Unity.Scenes.Editor",
+        "Unity.Entities.Editor",
+        "Unity.Entities.Tests",
+        "Unity.Build",
+        "Unity.Build.Classic",
+        "Unity.Build.Classic.Private",
+        "Unity.Properties"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "precompiledReferences": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true
+}
