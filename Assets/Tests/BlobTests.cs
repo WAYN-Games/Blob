@@ -30,7 +30,11 @@ public class BlobTests
         {
             BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
             ref var map = ref mapref.Value;
-            Assert.True(map.ContainsKey(initialData.GetKeyArray(Allocator.Temp)[0]));
+            int key = initialData.GetKeyArray(Allocator.Temp)[0];
+            Assert.True(map.ContainsKey(key));
+            var e = initialData.GetValuesForKey(key);
+            e.MoveNext();
+            Assert.AreEqual(e.Current, map.GetValuesForKey(initialData.GetKeyArray(Allocator.Temp)[0])[0]);
         }
     }
 
