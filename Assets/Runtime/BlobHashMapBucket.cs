@@ -17,6 +17,7 @@ public struct BlobHashMapBucket<TKey, TValue>
 
     public bool ContainsKey(TKey key)
     {
+        if (KeysArray.Length == 0) return false; // Empty bucket
         if (KeysArray.Length == 1 && key.Equals(KeysArray[0])) return true;
         return FindKeyIndex(key) >= 0;
     }
@@ -53,11 +54,12 @@ public struct BlobHashMapBucket<TKey, TValue>
         while (startIndex <= endIndex)
         {
             int lookupIndex = (int)math.floor((startIndex + endIndex) / 2);
-            if (hash < KeyIndexes[lookupIndex].KeyHash)
+
+            if (hash > KeyIndexes[lookupIndex].KeyHash)
             {
                 startIndex = lookupIndex + 1;
             }
-            else if (hash > KeyIndexes[lookupIndex].KeyHash)
+            else if (hash < KeyIndexes[lookupIndex].KeyHash)
             {
                 endIndex = lookupIndex - 1;
             }
@@ -70,21 +72,32 @@ public struct BlobHashMapBucket<TKey, TValue>
 
                 // If not start linear search backward to find the correct key
                 int originalLookUpIndex = lookupIndex;
-                while (hash == KeyIndexes[lookupIndex].KeyHash && lookupIndex >= 0)
+                while (hash == KeyIndexes[lookupIndex].KeyHash && !key.Equals(KeysArray[lookupIndex]) && lookupIndex > 0)
                 {
                     lookupIndex--;
-                    if (key.Equals(KeysArray[lookupIndex])) return lookupIndex; // even if same hash there is still a small chance to have a different key 
+                    if (key.Equals(KeysArray[lookupIndex]))
+                    {
+                        return lookupIndex; // even if same hash there is still a small chance to have a different key 
+                    }
+
                 }
 
 
-                // If we still did not fin it start linear search forward to find the correct key
+                // If we still did not find it start linear search forward to find the correct key
                 lookupIndex = originalLookUpIndex;
-                while (hash == KeyIndexes[lookupIndex].KeyHash && lookupIndex < KeyIndexes.Length)
+                while (hash == KeyIndexes[lookupIndex].KeyHash && !key.Equals(KeysArray[lookupIndex]) && lookupIndex < KeyIndexes.Length - 1)
                 {
+
                     lookupIndex++;
-                    if (key.Equals(KeysArray[lookupIndex])) return lookupIndex; // even if same hash there is still a small chance to have a different key 
+                    if (key.Equals(KeysArray[lookupIndex]))
+                    {
+                        return lookupIndex; // even if same hash there is still a small chance to have a different key 
+                    }
                 }
+                // No match found
+                return -1;
             }
+
         }
 
         return -1;

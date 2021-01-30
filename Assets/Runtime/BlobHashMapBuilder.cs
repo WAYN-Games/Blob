@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
-using UnityEngine;
 
 public class BlobHashMapBuilder<TKey, TValue>
     where TKey : struct, IEquatable<TKey>, IComparable<TKey>
@@ -15,9 +13,10 @@ public class BlobHashMapBuilder<TKey, TValue>
     private BlobBuilder _bb;
     private int _bucketCount;
     private float _loadFactor;
-    private Dictionary<int, Dictionary<int, (TKey, KeyIndex, List<TValue>)>> _data;
+    private Dictionary<int, SortedDictionary<TKey, (int, KeyIndex, List<TValue>)>> _data;
     private List<KeyValuePair<TKey, TValue>> _rehashList;
     private HashSet<TKey> _keySet;
+    private bool IsRehashing = false;
 
     /// <summary>
     /// 
@@ -30,7 +29,7 @@ public class BlobHashMapBuilder<TKey, TValue>
         _bb = bb;
         _bucketCount = bucketCount == -1 ? 16 : bucketCount;
         _loadFactor = loadFactor;
-        _data = new Dictionary<int, Dictionary<int, (TKey, KeyIndex, List<TValue>)>>();
+        _data = new Dictionary<int, SortedDictionary<TKey, (int, KeyIndex, List<TValue>)>>();
         _rehashList = new List<KeyValuePair<TKey, TValue>>();
         _keySet = new HashSet<TKey>();
     }
@@ -55,18 +54,24 @@ public class BlobHashMapBuilder<TKey, TValue>
 
     private void Rehash()
     {
+        IsRehashing = true;
         _bucketCount *= 2;
         _data.Clear();
         AddAll(_rehashList);
+
+        IsRehashing = false;
     }
 
     public BlobHashMapBuilder<TKey, TValue> Add(TKey key, TValue value)
     {
-        if (_bucketCount * _loadFactor < _keySet.Count) Rehash();
-        _keySet.Add(key);
-        _rehashList.Add(new KeyValuePair<TKey, TValue>(key, value));
+        if (!IsRehashing)
+        {
+            if (_bucketCount * _loadFactor < _keySet.Count) Rehash();
+            _keySet.Add(key);
+            _rehashList.Add(new KeyValuePair<TKey, TValue>(key, value));
+        }
         (int bucketIndex, int keyHash) = BlobHashMapUtils.ComputeBucketIndex(key, _bucketCount);
-        Dictionary<int, (TKey, KeyIndex, List<TValue>)> bucket;
+        SortedDictionary<TKey, (int, KeyIndex, List<TValue>)> bucket;
 
         if (_data.ContainsKey(bucketIndex))
         {
@@ -74,7 +79,7 @@ public class BlobHashMapBuilder<TKey, TValue>
         }
         else
         {
-            bucket = new Dictionary<int, (TKey, KeyIndex, List<TValue>)>();
+            bucket = new SortedDictionary<TKey, (int, KeyIndex, List<TValue>)>();
             _data.Add(bucketIndex, bucket);
         }
 
@@ -83,18 +88,18 @@ public class BlobHashMapBuilder<TKey, TValue>
         return this;
     }
 
-    private void AddDataToBucket(Dictionary<int, (TKey, KeyIndex, List<TValue>)> bucket, int keyHash, TKey key, TValue value)
+    private void AddDataToBucket(SortedDictionary<TKey, (int, KeyIndex, List<TValue>)> bucket, int keyHash, TKey key, TValue value)
     {
-        if (bucket.ContainsKey(keyHash))
+        if (bucket.ContainsKey(key))
         {
-            (TKey key, KeyIndex keyIndex, List<TValue> values) bucketData = bucket[keyHash];
+            (int keyHash, KeyIndex keyIndex, List<TValue> values) bucketData = bucket[key];
             bucketData.values.Add(value);
         }
         else
         {
             List<TValue> values = new List<TValue>();
             values.Add(value);
-            bucket.Add(keyHash, (key, new KeyIndex() { KeyHash = keyHash }, values));
+            bucket.Add(key, (keyHash, new KeyIndex() { KeyHash = keyHash }, values));
         }
     }
 
@@ -103,21 +108,19 @@ public class BlobHashMapBuilder<TKey, TValue>
         ref BlobMultiHashMap<TKey, TValue> blobMap = ref _bb.ConstructRoot<BlobMultiHashMap<TKey, TValue>>();
 
         SetTotalCount(ref blobMap);
-        SetTotalKeyCount(ref blobMap);
 
         BlobBuilderArray<BlobHashMapBucket<TKey, TValue>> buckets = _bb.Allocate(ref blobMap.BucketArray, _bucketCount);
 
         for (int i = 0; i < _bucketCount; i++)
         {
-            Debug.Log($"Processing bucket {i}");
-            if (_data.TryGetValue(i, out Dictionary<int, (TKey, KeyIndex, List<TValue>)> bucketData))
+            //  Debug.Log($"Processing bucket {i}");
+            if (_data.TryGetValue(i, out SortedDictionary<TKey, (int, KeyIndex, List<TValue>)> bucketData))
             {
                 ref BlobHashMapBucket<TKey, TValue> bucket = ref buckets[i];
                 // Sort the bucket by key to make sure all values for the same key are one after another.
-                KeyValuePair<int, (TKey, KeyIndex, List<TValue>)>[] orderedData = bucketData.OrderBy((KeyValuePair<int, (TKey key, KeyIndex, List<TValue>)> pair) => pair.Value.key).ToArray();
                 int bucketKeyCount = bucketData.Keys.Count;
                 int bucketValueCount = 0;
-                foreach ((TKey key, KeyIndex keyIndex, List<TValue> values) bucketDataValue in bucketData.Values)
+                foreach ((int keyHash, KeyIndex keyIndex, List<TValue> values) bucketDataValue in bucketData.Values)
                 {
                     bucketValueCount += bucketDataValue.values.Count;
                 }
@@ -125,21 +128,24 @@ public class BlobHashMapBuilder<TKey, TValue>
                 BlobBuilderArray<KeyIndex> bucketKeyIndexes = _bb.Allocate(ref bucket.KeyIndexes, bucketKeyCount);
                 BlobBuilderArray<TValue> bucketValues = _bb.Allocate(ref bucket.ValuesArray, bucketValueCount);
                 int firstIndex = 0;
-                for (int j = 0; j < orderedData.Length; j++)
+                SortedDictionary<TKey, (int, KeyIndex, List<TValue>)>.Enumerator enumerator = bucketData.GetEnumerator();
+                int j = 0;
+                while (enumerator.MoveNext())
                 {
-
-                    (TKey key, KeyIndex keyIndex, List<TValue> values) = orderedData[j].Value;
-                    bucketKeys[j] = key;
+                    KeyValuePair<TKey, (int keyHash, KeyIndex keyIndex, List<TValue> valueList)> current = enumerator.Current;
+                    bucketKeys[j] = current.Key;
+                    KeyIndex keyIndex = current.Value.keyIndex;
                     keyIndex.FirstIndex = firstIndex;
+                    var values = current.Value.valueList;
                     keyIndex.ElementCount = values.Count;
                     bucketKeyIndexes[j] = keyIndex;
 
                     for (int k = 0; k < values.Count; k++)
                     {
-                        Debug.Log($"{key} => {values[k]} ");
                         bucketValues[firstIndex + k] = values[k];
                     }
                     firstIndex += keyIndex.ElementCount;
+                    j++;
                 }
             }
         }
@@ -151,24 +157,16 @@ public class BlobHashMapBuilder<TKey, TValue>
     {
         ref int ValueCount = ref _bb.Allocate(ref blobMap.ValueCount);
         int valueCount = 0;
-        foreach (Dictionary<int, (TKey key, KeyIndex keyIndex, List<TValue> values)> bucket in _data.Values)
+        var e = _data.Values.GetEnumerator();
+        while (e.MoveNext())
         {
-            foreach ((TKey key, KeyIndex keyIndex, List<TValue> values) key in bucket.Values)
+            var bucket = e.Current;
+            foreach ((int keyHash, KeyIndex keyIndex, List<TValue> values) key in bucket.Values)
             {
                 valueCount += key.values.Count;
             }
         }
         ValueCount = valueCount;
-    }
-    private void SetTotalKeyCount(ref BlobMultiHashMap<TKey, TValue> blobMap)
-    {
-        ref int KeyCount = ref _bb.Allocate(ref blobMap.KeyCount);
-        int keyCount = 0;
-        foreach (Dictionary<int, (TKey, KeyIndex, List<TValue>)> bucket in _data.Values)
-        {
-            keyCount += bucket.Values.Count;
-        }
-        KeyCount = keyCount;
     }
 
 }

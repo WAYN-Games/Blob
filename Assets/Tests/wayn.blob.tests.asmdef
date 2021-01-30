@@ -6,9 +6,12 @@
         "UnityEditor.TestRunner",
         "wayn.blob",
         "Unity.Entities",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.Mathematics"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
