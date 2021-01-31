@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -118,21 +119,31 @@ public struct BlobHashMapBucket<TKey, TValue>
             return new NativeArray<TValue>(0, allocator);
         }
         int elementCount = KeyIndexes[keyIndex].ElementCount;
-
-        NativeArray<TValue> result = new NativeArray<TValue>(elementCount, allocator);
         int firstIndex = KeyIndexes[keyIndex].FirstIndex;
-        for (int i = 0; i < elementCount; i++)
+
+        return GetReadOnlySubArray(firstIndex, elementCount); ;
+    }
+
+    private NativeArray<TValue> GetReadOnlySubArray(int start, int length)
+    {
+        unsafe
         {
-            result[i] = ValuesArray[firstIndex + i];
+            AtomicSafetyHandle m_Safety = AtomicSafetyHandle.Create();
+            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
+
+            NativeArray<TValue> result = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<TValue>(((byte*)ValuesArray.GetUnsafePtr()) + ((long)UnsafeUtility.SizeOf<TValue>()) * start, length, Allocator.Invalid);
+
+
+            AtomicSafetyHandle safety = m_Safety;
+
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(safety);
+            AtomicSafetyHandle.UseSecondaryVersion(ref safety);
+            AtomicSafetyHandle.SetAllowSecondaryVersionWriting(safety, false);
+
+            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref result, safety);
+
+            return result;
         }
 
-        return result;
-        /* can't manage to make this memory access work. 
-         * the idea would be to have a reader array point directly at the memory allocation of the blob asset.
-       unsafe
-       {
-           void* firstElementPointer = UnsafeUtility.AddressOf(ref ValuesArray[KeyIndexes[keyIndex].FirstIndex]);
-           return NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<TValue>(firstElementPointer, elementCount * UnsafeUtility.SizeOf<TValue>(), Allocator.None);
-       }*/
     }
 }
