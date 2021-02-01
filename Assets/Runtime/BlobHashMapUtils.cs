@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 internal struct BlobHashMapUtils
 {
@@ -15,7 +16,8 @@ internal struct BlobHashMapUtils
         return hashcode ^ (hashcode >> 16);
     }
 
-    internal static (int bucketIndex, int keyHash) ComputeBucketIndex<TKey>(TKey key, int bucketCount)
+
+    internal static KeyComputation ComputeBucketIndex<TKey>(TKey key, int bucketCount)
         where TKey : struct, IEquatable<TKey>
     {
         // Apply the bucket mask to the key hash so that we are sure the result is no larger than the bucket size.
@@ -27,6 +29,13 @@ internal struct BlobHashMapUtils
         // so the values for that key are store in the fourth bucket (bucket at index 3)
         int keyHash = KeyHash(key);
         int bucketIndex = keyHash & (bucketCount - 1);
-        return (bucketIndex, keyHash);
+        return new KeyComputation() { bucketIndex = bucketIndex, keyHash = keyHash };
     }
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct KeyComputation
+{
+    public int bucketIndex;
+    public int keyHash;
 }

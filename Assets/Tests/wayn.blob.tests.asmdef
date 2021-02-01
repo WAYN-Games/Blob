@@ -7,7 +7,9 @@
         "wayn.blob",
         "Unity.Entities",
         "Unity.Collections",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Unity.PerformanceTesting",
+        "Unity.Entities.Hybrid"
     ],
     "includePlatforms": [
         "Editor"

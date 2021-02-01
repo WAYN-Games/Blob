@@ -70,20 +70,20 @@ public class BlobHashMapBuilder<TKey, TValue>
             _keySet.Add(key);
             _rehashList.Add(new KeyValuePair<TKey, TValue>(key, value));
         }
-        (int bucketIndex, int keyHash) = BlobHashMapUtils.ComputeBucketIndex(key, _bucketCount);
+        KeyComputation keyComputation = BlobHashMapUtils.ComputeBucketIndex(key, _bucketCount);
         SortedDictionary<TKey, (int, KeyIndex, List<TValue>)> bucket;
 
-        if (_data.ContainsKey(bucketIndex))
+        if (_data.ContainsKey(keyComputation.bucketIndex))
         {
-            bucket = _data[bucketIndex];
+            bucket = _data[keyComputation.bucketIndex];
         }
         else
         {
             bucket = new SortedDictionary<TKey, (int, KeyIndex, List<TValue>)>();
-            _data.Add(bucketIndex, bucket);
+            _data.Add(keyComputation.bucketIndex, bucket);
         }
 
-        AddDataToBucket(bucket, keyHash, key, value);
+        AddDataToBucket(bucket, keyComputation.keyHash, key, value);
 
         return this;
     }

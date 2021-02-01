@@ -6,7 +6,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 
-public struct BlobHashMapBucket<TKey, TValue>
+internal struct BlobHashMapBucket<TKey, TValue>
     where TKey : struct, IEquatable<TKey>
     where TValue : struct
 
@@ -130,20 +130,13 @@ public struct BlobHashMapBucket<TKey, TValue>
         {
             AtomicSafetyHandle m_Safety = AtomicSafetyHandle.Create();
             AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
-
             NativeArray<TValue> result = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<TValue>(((byte*)ValuesArray.GetUnsafePtr()) + ((long)UnsafeUtility.SizeOf<TValue>()) * start, length, Allocator.Invalid);
-
-
             AtomicSafetyHandle safety = m_Safety;
-
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(safety);
             AtomicSafetyHandle.UseSecondaryVersion(ref safety);
             AtomicSafetyHandle.SetAllowSecondaryVersionWriting(safety, false);
-
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref result, safety);
-
             return result;
         }
-
     }
 }

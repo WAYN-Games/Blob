@@ -26,16 +26,16 @@ public struct BlobMultiHashMap<TKey, TValue>
     public bool ContainsKey(TKey key)
     {
         int bucketCount = BucketArray.Length;
-        (int bucketIndex, int keyHash) = BlobHashMapUtils.ComputeBucketIndex(key, bucketCount);
-        return BucketArray[bucketIndex].ContainsKey(key);
+        var keyComputation = BlobHashMapUtils.ComputeBucketIndex(key, bucketCount);
+        return BucketArray[keyComputation.bucketIndex].ContainsKey(key);
     }
 
     public NativeArray<TValue> GetValuesForKey(TKey key, Allocator allocator = Allocator.Temp)
     {
         // Find the bucket containing the values for the TKey
         int bucketCount = BucketArray.Length;
-        (int bucketIndex, int keyHash) = BlobHashMapUtils.ComputeBucketIndex(key, bucketCount);
+        KeyComputation keyComputation = BlobHashMapUtils.ComputeBucketIndex(key, bucketCount);
         // Retrieve the values for that key from the bucket.
-        return BucketArray[bucketIndex].GetValuesForKey(key, allocator);
+        return BucketArray[keyComputation.bucketIndex].GetValuesForKey(key, allocator);
     }
 }
