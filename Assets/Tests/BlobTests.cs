@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 
 public class BlobTests
@@ -39,21 +40,94 @@ public class BlobTests
     }
 
     [Test]
-    public void BlobMultiHashMapTest([Values(10, 100, 1000)] int size)
+    public void BlobMultiHashMapTest([Values(10, 100, 1000, 10000, 100000, 500000, 1000000)] int size)
     {
-        NativeMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset);
+        NativeMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset, Allocator.TempJob);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
-            BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
+            BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.TempJob);
             ref var map = ref mapref.Value;
 
-            foreach (var key in initialData.GetUniqueKeyArray(Allocator.Temp).Item1)
+            var uniqueKeys = initialData.GetUniqueKeyArray(Allocator.TempJob);
+
+            NativeHashMap<int, int> mapResults = new NativeHashMap<int, int>(uniqueKeys.Item2, Allocator.TempJob);
+            NativeHashMap<int, int> blobResults = new NativeHashMap<int, int>(uniqueKeys.Item2, Allocator.TempJob);
+            NativeArray<int> ukeys = uniqueKeys.Item1.GetSubArray(0, uniqueKeys.Item2);
+
+            var mapDep = new MapJob()
             {
-                AssertForKey(key, initialData, ref map);
+                Keys = ukeys,
+                map = initialData,
+                results = mapResults.AsParallelWriter()
+            }.Schedule(uniqueKeys.Item2, 1);
+
+
+            var blobDep = new BlobJob()
+            {
+                Keys = ukeys,
+                mapref = mapref,
+                results = blobResults.AsParallelWriter()
+            }.Schedule(uniqueKeys.Item2, 1);
+
+            mapDep.Complete();
+            blobDep.Complete();
+            for (int i = 0; i < ukeys.Length; i++)
+            {
+                Assert.True(mapResults.ContainsKey(ukeys[i]));
+                Assert.True(blobResults.ContainsKey(ukeys[i]));
+                Assert.AreEqual(mapResults[ukeys[i]], blobResults[ukeys[i]]);
             }
+
+            mapref.Dispose();
+            mapResults.Dispose();
+            blobResults.Dispose();
+            uniqueKeys.Item1.Dispose();
+            initialData.Dispose();
+        }
+
+    }
+
+    public struct MapJob : IJobParallelFor
+    {
+        [ReadOnly] public NativeArray<int> Keys;
+        [ReadOnly] public NativeMultiHashMap<int, int> map;
+        public NativeHashMap<int, int>.ParallelWriter results;
+
+        public void Execute(int index)
+        {
+            int key = Keys[index];
+            var e = map.GetValuesForKey(key);
+            int sum = 0;
+
+            while (e.MoveNext())
+            {
+                sum += e.Current;
+            }
+
+            results.TryAdd(key, sum);
         }
     }
 
+    public struct BlobJob : IJobParallelFor
+    {
+        [ReadOnly] public NativeArray<int> Keys;
+        [ReadOnly] public BlobAssetReference<BlobMultiHashMap<int, int>> mapref;
+        public NativeHashMap<int, int>.ParallelWriter results;
+
+        public void Execute(int index)
+        {
+            ref var map = ref mapref.Value;
+            int key = Keys[index];
+            NativeArray<int> values = map.GetValuesForKey(key, Allocator.Temp);
+            int sum = 0;
+            for (int i = 0; i < values.Length; i++)
+            {
+                sum += values[i];
+            }
+
+            results.TryAdd(key, sum);
+        }
+    }
 
 
     [Test]

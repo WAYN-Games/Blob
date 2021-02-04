@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Unity.Collections;
@@ -10,12 +10,12 @@ namespace Unity.Entities
 {
     internal unsafe struct EntityQueryManager
     {
-        private ComponentDependencyManager*  m_DependencyManager;
-        private BlockAllocator               m_GroupDataChunkAllocator;
+        private ComponentDependencyManager* m_DependencyManager;
+        private BlockAllocator m_GroupDataChunkAllocator;
         private UnsafeEntityQueryDataPtrList m_EntityGroupDatas;
 
-        private UntypedUnsafeHashMap    m_EntityGroupDataCacheUntyped;
-        internal int                         m_EntityQueryMasksAllocated;
+        private UntypedUnsafeHashMap m_EntityGroupDataCacheUntyped;
+        internal int m_EntityQueryMasksAllocated;
 
         public static void Create(EntityQueryManager* queryManager, ComponentDependencyManager* dependencyManager)
         {
@@ -212,8 +212,8 @@ namespace Unity.Entities
                 }
 
                 ConstructTypeArray(ref unsafeScratchAllocator, typesNone, out outQuery[q].None, out outQuery[q].NoneAccessMode, out outQuery[q].NoneCount);
-                ConstructTypeArray(ref unsafeScratchAllocator, typesAll,  out outQuery[q].All,  out outQuery[q].AllAccessMode,  out outQuery[q].AllCount);
-                ConstructTypeArray(ref unsafeScratchAllocator, typesAny,  out outQuery[q].Any,  out outQuery[q].AnyAccessMode,  out outQuery[q].AnyCount);
+                ConstructTypeArray(ref unsafeScratchAllocator, typesAll, out outQuery[q].All, out outQuery[q].AllAccessMode, out outQuery[q].AllCount);
+                ConstructTypeArray(ref unsafeScratchAllocator, typesAny, out outQuery[q].Any, out outQuery[q].AnyAccessMode, out outQuery[q].AnyCount);
                 outQuery[q].Options = queryDesc[q].Options;
             }
 
@@ -430,7 +430,7 @@ namespace Unity.Entities
             return true;
         }
 
-        void* ChunkAllocate<T>(int count = 1, void *source = null) where T : struct
+        void* ChunkAllocate<T>(int count = 1, void* source = null) where T : struct
         {
             var bytes = count * UnsafeUtility.SizeOf<T>();
             if (bytes == 0)
@@ -807,19 +807,19 @@ namespace Unity.Entities
 
     unsafe struct ArchetypeQuery : IEquatable<ArchetypeQuery>
     {
-        public int*     Any;
-        public byte*    AnyAccessMode;
-        public int      AnyCount;
+        public int* Any;
+        public byte* AnyAccessMode;
+        public int AnyCount;
 
-        public int*     All;
-        public byte*    AllAccessMode;
-        public int      AllCount;
+        public int* All;
+        public byte* AllAccessMode;
+        public int AllCount;
 
-        public int*     None;
-        public byte*    NoneAccessMode;
-        public int      NoneCount;
+        public int* None;
+        public byte* NoneAccessMode;
+        public int NoneCount;
 
-        public EntityQueryOptions  Options;
+        public EntityQueryOptions Options;
 
         public bool Equals(ArchetypeQuery other)
         {
@@ -848,7 +848,7 @@ namespace Unity.Entities
         {
             unchecked
             {
-                var hashCode =                  (AnyCount + 1);
+                var hashCode = (AnyCount + 1);
                 hashCode = 397 * hashCode ^ (AllCount + 1);
                 hashCode = 397 * hashCode ^ (NoneCount + 1);
                 hashCode = (int)math.hash(Any, sizeof(int) * AnyCount, (uint)hashCode);
@@ -875,7 +875,7 @@ namespace Unity.Entities
 
         internal bool CacheValid;
 
-        public Chunk** Ptr { get => (Chunk**)MatchingChunks.Ptr; }
+        public Chunk** Ptr { get => MatchingChunks.Ptr; }
         public int Length { get => MatchingChunks.Length; }
         public bool IsCacheValid { get => CacheValid; }
 
@@ -918,7 +918,7 @@ namespace Unity.Entities
                 {
                     if (chunkCounter >= cache.MatchingChunks.Length)
                         return false;
-                    if(cache.MatchingChunks.Ptr[chunkCounter++] != archetype->Chunks[chunkIndex])
+                    if (cache.MatchingChunks.Ptr[chunkCounter++] != archetype->Chunks[chunkIndex])
                         return false;
                 }
             }
@@ -934,26 +934,26 @@ namespace Unity.Entities
     unsafe struct EntityQueryData : IDisposable
     {
         //@TODO: better name or remove entirely...
-        public ComponentType*       RequiredComponents;
-        public int                  RequiredComponentsCount;
+        public ComponentType* RequiredComponents;
+        public int RequiredComponentsCount;
 
-        public int*                 ReaderTypes;
-        public int                  ReaderTypesCount;
+        public int* ReaderTypes;
+        public int ReaderTypesCount;
 
-        public int*                 WriterTypes;
-        public int                  WriterTypesCount;
+        public int* WriterTypes;
+        public int WriterTypesCount;
 
-        public ArchetypeQuery*      ArchetypeQuery;
-        public int                  ArchetypeQueryCount;
+        public ArchetypeQuery* ArchetypeQuery;
+        public int ArchetypeQueryCount;
 
-        public EntityQueryMask      EntityQueryMask;
+        public EntityQueryMask EntityQueryMask;
 
         public UnsafeMatchingArchetypePtrList MatchingArchetypes;
         internal UnsafeCachedChunkList MatchingChunkCache;
 
         public unsafe UnsafeCachedChunkList GetMatchingChunkCache()
         {
-            if(!MatchingChunkCache.IsCacheValid)
+            if (!MatchingChunkCache.IsCacheValid)
                 ChunkIterationUtility.RebuildChunkListCache((EntityQueryData*)UnsafeUtility.AddressOf(ref this));
 
             return MatchingChunkCache;

@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
+using UnityEngine;
 
 public class BlobHashMapBuilder<TKey, TValue>
     where TKey : struct, IEquatable<TKey>, IComparable<TKey>
@@ -105,6 +106,7 @@ public class BlobHashMapBuilder<TKey, TValue>
 
     public BlobAssetReference<BlobMultiHashMap<TKey, TValue>> CreateBlobAssetReference(Allocator allocator = Allocator.Temp)
     {
+
         ref BlobMultiHashMap<TKey, TValue> blobMap = ref _bb.ConstructRoot<BlobMultiHashMap<TKey, TValue>>();
 
         SetTotalCount(ref blobMap);
@@ -149,6 +151,9 @@ public class BlobHashMapBuilder<TKey, TValue>
                 }
             }
         }
+
+        Debug.Log($"Blob asset ref created with {_bucketCount} buckets");
+        Debug.Log($"Blob asset ref created with {_bucketCount} buckets");
         return _bb.CreateBlobAssetReference<BlobMultiHashMap<TKey, TValue>>(allocator);
     }
 
@@ -166,6 +171,8 @@ public class BlobHashMapBuilder<TKey, TValue>
                 valueCount += key.values.Count;
             }
         }
+
+        Debug.Log($"Creating blob asset ref with { valueCount} values");
         ValueCount = valueCount;
     }
 
