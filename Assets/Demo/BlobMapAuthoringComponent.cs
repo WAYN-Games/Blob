@@ -22,7 +22,7 @@ public class BlobMapAuthoringComponent : MonoBehaviour, IConvertGameObjectToEnti
         BlobAssetReference<BlobMultiHashMap<int, int>> mapref;
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
-            mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
+            mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Persistent);
 
 
         }
