@@ -1,0 +1,10 @@
+{
+    "name": "WaynGroup.WaynBlob.Editor",
+    "references": [
+      "WaynGroup.WaynBlob"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
