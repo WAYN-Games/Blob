@@ -1,13 +1,13 @@
 {
-    "name": "WaynGroup.WaynBlob.Editor.Tests",
+    "name": "WaynGames.Blob.Editor.Tests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Unity.Mathematics",
-        "WaynGroup.WaynBlob",
         "Unity.Entities",
-        "Unity.Collections"
+        "Unity.Collections",
+        "WaynGames.Blob.Runtime"
     ],
     "includePlatforms": [
         "Editor"

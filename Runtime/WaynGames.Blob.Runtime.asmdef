@@ -1,5 +1,5 @@
 {
-    "name": "WaynGroup.WaynBlob",
+    "name": "WaynGames.Blob.Runtime",
     "rootNamespace": "",
     "references": [
         "GUID:e0cd26848372d4e5c891c569017e11f1",
