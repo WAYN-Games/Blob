@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Harmonisation of naming from WAYN Group to WAYN Games
 * Respect package naming convention for package and assembly definitions
 
+### Fix
+* Missing com.unity.entities dependency
+
 ## [0.2.0] - 2021-06-06
 
 ### Update

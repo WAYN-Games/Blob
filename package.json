@@ -6,5 +6,8 @@
   "author": {
     "name": "WAYN Games"
   },
-  "description": "This package contains additionnal blob structure for use in DOTS projects."
+  "description": "This package contains additionnal blob structure for use in DOTS projects.",
+  "dependencies": {
+    "com.unity.entities": "0.17.0-preview.42"
+  }
 }
