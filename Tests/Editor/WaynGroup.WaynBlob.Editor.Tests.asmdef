@@ -4,12 +4,10 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Unity.Entities",
-        "Unity.Collections",
         "Unity.Mathematics",
-        "Unity.PerformanceTesting",
-        "Unity.Entities.Hybrid",
-        "Unity.Jobs"
+        "WaynGroup.WaynBlob",
+        "Unity.Entities",
+        "Unity.Collections"
     ],
     "includePlatforms": [
         "Editor"
