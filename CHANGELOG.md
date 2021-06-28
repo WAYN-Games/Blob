@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 ## [0.3.0] - 2021-06-28
 
+### Add 
+* Sonar Cloud config
+
+## [0.3.0] - 2021-06-28
+
 ### Update 
 * Revmoved allocator parameter from GetValuesForKey(TKey key) : was defaulted to Temp and used only to allocate the zero size array, now allocator is always None.
 
