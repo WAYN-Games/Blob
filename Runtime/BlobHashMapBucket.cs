@@ -111,12 +111,12 @@ internal struct BlobHashMapBucket<TKey, TValue>
     /// <param name="key"></param>
     /// <param name="allocator"></param>
     /// <returns></returns>
-    public NativeArray<TValue> GetValuesForKey(TKey key, Allocator allocator = Allocator.Temp)
+    public NativeArray<TValue> GetValuesForKey(TKey key)
     {
         int keyIndex = FindKeyIndex(key);
         if (keyIndex < 0)
         {
-            return new NativeArray<TValue>(0, allocator);
+            return new NativeArray<TValue>(0, Allocator.None);
         }
         int elementCount = KeyIndexes[keyIndex].ElementCount;
         int firstIndex = KeyIndexes[keyIndex].FirstIndex;
@@ -128,14 +128,19 @@ internal struct BlobHashMapBucket<TKey, TValue>
     {
         unsafe
         {
-            AtomicSafetyHandle m_Safety = AtomicSafetyHandle.Create();
-            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(m_Safety);
-            NativeArray<TValue> result = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<TValue>(((byte*)ValuesArray.GetUnsafePtr()) + ((long)UnsafeUtility.SizeOf<TValue>()) * start, length, Allocator.Invalid);
-            AtomicSafetyHandle safety = m_Safety;
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle safety = AtomicSafetyHandle.GetTempMemoryHandle();
+            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(safety);
+#endif
+            NativeArray<TValue> result = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<TValue>(((byte*)ValuesArray.GetUnsafePtr()) + ((long)UnsafeUtility.SizeOf<TValue>()) * start, length, Allocator.None);
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(safety);
             AtomicSafetyHandle.UseSecondaryVersion(ref safety);
             AtomicSafetyHandle.SetAllowSecondaryVersionWriting(safety, false);
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref result, safety);
+
+
+#endif
             return result;
         }
     }
