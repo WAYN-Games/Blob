@@ -31,13 +31,8 @@ internal struct BlobHashMapBucket<TKey, TValue>
     /// <returns></returns>
     internal int FindKeyIndex(TKey key)
     {
-        // if there is only one key in the bucket
-        if (KeysArray.Length == 1)
-        {
-            // and it's the key we look for return 0 (only exisitng index)
-            if (key.Equals(KeysArray[0])) return 0;
-            return -1;
-        }
+        // if there is only one key in the bucket and it's the key we look for return 0 (only exisitng index)
+        if (KeysArray.Length == 1 && key.Equals(KeysArray[0])) return 0;
         return BinarySearch(key);
     }
 
@@ -59,44 +54,42 @@ internal struct BlobHashMapBucket<TKey, TValue>
             if (hash > KeyIndexes[lookupIndex].KeyHash)
             {
                 startIndex = lookupIndex + 1;
+                continue;
             }
-            else if (hash < KeyIndexes[lookupIndex].KeyHash)
+            if (hash < KeyIndexes[lookupIndex].KeyHash)
             {
                 endIndex = lookupIndex - 1;
+                continue;
             }
-            else
+
+            // we found the correct hash
+
+            // If it's trueliy the same key, return the index
+            if (key.Equals(KeysArray[lookupIndex])) return lookupIndex;
+
+            // If not start linear search backward to find the correct key
+            int originalLookUpIndex = lookupIndex;
+            while (hash == KeyIndexes[lookupIndex].KeyHash && !key.Equals(KeysArray[lookupIndex]) && lookupIndex > 0)
             {
-                // we found the correct hash
-
-                // If it's trueliy the same key, return the index
-                if (key.Equals(KeysArray[lookupIndex])) return lookupIndex;
-
-                // If not start linear search backward to find the correct key
-                int originalLookUpIndex = lookupIndex;
-                while (hash == KeyIndexes[lookupIndex].KeyHash && !key.Equals(KeysArray[lookupIndex]) && lookupIndex > 0)
+                lookupIndex--;
+                if (key.Equals(KeysArray[lookupIndex]))
                 {
-                    lookupIndex--;
-                    if (key.Equals(KeysArray[lookupIndex]))
-                    {
-                        return lookupIndex; // even if same hash there is still a small chance to have a different key 
-                    }
-
+                    return lookupIndex; // even if same hash there is still a small chance to have a different key 
                 }
 
+            }
 
-                // If we still did not find it start linear search forward to find the correct key
-                lookupIndex = originalLookUpIndex;
-                while (hash == KeyIndexes[lookupIndex].KeyHash && !key.Equals(KeysArray[lookupIndex]) && lookupIndex < KeyIndexes.Length - 1)
+
+            // If we still did not find it start linear search forward to find the correct key
+            lookupIndex = originalLookUpIndex;
+            while (hash == KeyIndexes[lookupIndex].KeyHash && !key.Equals(KeysArray[lookupIndex]) && lookupIndex < KeyIndexes.Length - 1)
+            {
+
+                lookupIndex++;
+                if (key.Equals(KeysArray[lookupIndex]))
                 {
-
-                    lookupIndex++;
-                    if (key.Equals(KeysArray[lookupIndex]))
-                    {
-                        return lookupIndex; // even if same hash there is still a small chance to have a different key 
-                    }
+                    return lookupIndex; // even if same hash there is still a small chance to have a different key 
                 }
-                // No match found
-                return -1;
             }
 
         }
@@ -106,7 +99,7 @@ internal struct BlobHashMapBucket<TKey, TValue>
 
     /// <summary>
     /// Retreive the values for a given Key.
-    /// If there is no values for that key, retrun a 0 sized NativeArray.
+    /// If there is no values for that key, retrun a default NativeArray.
     /// </summary>
     /// <param name="key"></param>
     /// <param name="allocator"></param>
@@ -116,7 +109,7 @@ internal struct BlobHashMapBucket<TKey, TValue>
         int keyIndex = FindKeyIndex(key);
         if (keyIndex < 0)
         {
-            return new NativeArray<TValue>(0, Allocator.None);
+            return default;
         }
         int elementCount = KeyIndexes[keyIndex].ElementCount;
         int firstIndex = KeyIndexes[keyIndex].FirstIndex;
@@ -144,4 +137,8 @@ internal struct BlobHashMapBucket<TKey, TValue>
             return result;
         }
     }
+
+
+
+
 }

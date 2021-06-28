@@ -7,7 +7,8 @@
         "Unity.Mathematics",
         "Unity.Entities",
         "Unity.Collections",
-        "WaynGames.Blob.Runtime"
+        "WaynGames.Blob.Runtime",
+        "Unity.Burst"
     ],
     "includePlatforms": [
         "Editor"

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 using NUnit.Framework;
 
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+
+
 
 public class BlobTests
 {
@@ -14,13 +17,19 @@ public class BlobTests
     [Test]
     public void BlobMultiHashMapNonExistingKeyTest([Values(0, 10, 100, 1000)] int size)
     {
+        if (!BurstCompiler.IsEnabled && size > 100) return;
         NativeMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
             BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
             ref var map = ref mapref.Value;
-            Assert.False(map.ContainsKey(4));
+            Assert.False(map.ContainsKey(-4));
+            Assert.AreEqual(0, map.GetValuesForKey(-4).Length);
+            Assert.False(map.GetValuesForKey(-4).IsCreated);
         }
+
+
+
     }
 
     [Test]
@@ -42,6 +51,7 @@ public class BlobTests
     [Test]
     public void BlobMultiHashMapTest([Values(10, 100, 1000, 10000, 100000, 500000, 1000000)] int size)
     {
+        if (!BurstCompiler.IsEnabled && size > 100) return;
         NativeMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset, Allocator.TempJob);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
@@ -133,6 +143,7 @@ public class BlobTests
     [Test]
     public void BlobMultiHashMapWithColidingKeyTest([Values(10, 100, 1000)] int size)
     {
+        if (!BurstCompiler.IsEnabled && size > 100) return;
         List<CollidingKey> keys = new List<CollidingKey>();
         foreach (int i in dataset)
         {
