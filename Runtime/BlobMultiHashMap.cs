@@ -30,12 +30,12 @@ public struct BlobMultiHashMap<TKey, TValue>
         return BucketArray[keyComputation.bucketIndex].ContainsKey(key);
     }
 
-    public NativeArray<TValue> GetValuesForKey(TKey key, Allocator allocator = Allocator.Temp)
+    public NativeArray<TValue> GetValuesForKey(TKey key)
     {
         // Find the bucket containing the values for the TKey
         int bucketCount = BucketArray.Length;
         KeyComputation keyComputation = BlobHashMapUtils.ComputeBucketIndex(key, bucketCount);
         // Retrieve the values for that key from the bucket.
-        return BucketArray[keyComputation.bucketIndex].GetValuesForKey(key, allocator);
+        return BucketArray[keyComputation.bucketIndex].GetValuesForKey(key);
     }
 }
