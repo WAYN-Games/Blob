@@ -118,7 +118,7 @@ public class BlobTests
         {
             ref var map = ref mapref.Value;
             int key = Keys[index];
-            NativeArray<int> values = map.GetValuesForKey(key, Allocator.Temp);
+            NativeArray<int> values = map.GetValuesForKey(key);
             int sum = 0;
             for (int i = 0; i < values.Length; i++)
             {
