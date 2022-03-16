@@ -11,7 +11,7 @@ To work with the unity Entities 0.17 (or 0.50) package, some changes must be don
 [![openupm](https://img.shields.io/npm/v/com.wayn-games.blob?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.wayn-games.blob/)
 
 # Exemple :
-
+```cs
 	[Test]
     public void SimpleExempleTest()
     {
@@ -36,3 +36,4 @@ To work with the unity Entities 0.17 (or 0.50) package, some changes must be don
             Assert.IsTrue(map.ContainsKey(5));                          // Check that the blob asset contains at least one value for key 5
         }
     }
+```
