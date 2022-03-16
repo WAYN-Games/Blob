@@ -16,15 +16,25 @@ public struct BlobMultiHashMap<TKey, TValue>
     where TKey : struct, IEquatable<TKey>
     where TValue : struct
 {
+    #region Public Fields
+
+    /// <summary>
+    /// The total number of element in the Map.
+    /// </summary>
+    public BlobPtr<int> ValueCount;
+
+    #endregion Public Fields
+
+    #region Internal Fields
 
     /// <summary>
     /// List of buckets in the map.
     /// </summary>
     internal BlobArray<BlobHashMapBucket<TKey, TValue>> BucketArray;
-    /// <summary>
-    /// The total number of element in the Map.
-    /// </summary>
-    public BlobPtr<int> ValueCount;
+
+    #endregion Internal Fields
+
+    #region Public Methods
 
     public bool ContainsKey(TKey key)
     {
@@ -32,7 +42,6 @@ public struct BlobMultiHashMap<TKey, TValue>
         var keyComputation = BlobHashMapUtils.ComputeBucketIndex(key, bucketCount);
         return BucketArray[keyComputation.bucketIndex].ContainsKey(key);
     }
-
 
     public NativeArray<TValue> GetValuesForKey(TKey key)
     {
@@ -43,4 +52,5 @@ public struct BlobMultiHashMap<TKey, TValue>
         return BucketArray[keyComputation.bucketIndex].GetValuesForKey(key);
     }
 
+    #endregion Public Methods
 }

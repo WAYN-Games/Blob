@@ -9,6 +9,8 @@ public class BlobHashMapBuilder<TKey, TValue>
     where TKey : struct, IEquatable<TKey>, IComparable<TKey>
     where TValue : struct
 {
+    #region Private Fields
+
     private BlobBuilder _bb;
     private int _bucketCount;
     private float _loadFactor;
@@ -17,8 +19,12 @@ public class BlobHashMapBuilder<TKey, TValue>
     private HashSet<TKey> _keySet;
     private bool IsRehashing = false;
 
+    #endregion Private Fields
+
+    #region Public Constructors
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="bb"></param>
     /// <param name="bucketCount"></param>
@@ -32,6 +38,10 @@ public class BlobHashMapBuilder<TKey, TValue>
         _rehashList = new List<KeyValuePair<TKey, TValue>>();
         _keySet = new HashSet<TKey>();
     }
+
+    #endregion Public Constructors
+
+    #region Public Methods
 
     public BlobHashMapBuilder<TKey, TValue> AddAll(IEnumerator<KeyValue<TKey, TValue>> elements)
     {
@@ -49,16 +59,6 @@ public class BlobHashMapBuilder<TKey, TValue>
             Add(element.Key, element.Value);
         }
         return this;
-    }
-
-    private void Rehash()
-    {
-        IsRehashing = true;
-        _bucketCount *= 2;
-        _data.Clear();
-        AddAll(_rehashList);
-
-        IsRehashing = false;
     }
 
     public BlobHashMapBuilder<TKey, TValue> Add(TKey key, TValue value)
@@ -87,24 +87,8 @@ public class BlobHashMapBuilder<TKey, TValue>
         return this;
     }
 
-    private void AddDataToBucket(SortedDictionary<TKey, (int, KeyIndex, List<TValue>)> bucket, int keyHash, TKey key, TValue value)
-    {
-        if (bucket.ContainsKey(key))
-        {
-            (int keyHash, KeyIndex keyIndex, List<TValue> values) bucketData = bucket[key];
-            bucketData.values.Add(value);
-        }
-        else
-        {
-            List<TValue> values = new List<TValue>();
-            values.Add(value);
-            bucket.Add(key, (keyHash, new KeyIndex() { KeyHash = keyHash }, values));
-        }
-    }
-
     public BlobAssetReference<BlobMultiHashMap<TKey, TValue>> CreateBlobAssetReference(Allocator allocator = Allocator.Temp)
     {
-
         ref BlobMultiHashMap<TKey, TValue> blobMap = ref _bb.ConstructRoot<BlobMultiHashMap<TKey, TValue>>();
 
         SetTotalCount(ref blobMap);
@@ -150,10 +134,37 @@ public class BlobHashMapBuilder<TKey, TValue>
             }
         }
 
-
         return _bb.CreateBlobAssetReference<BlobMultiHashMap<TKey, TValue>>(allocator);
     }
 
+    #endregion Public Methods
+
+    #region Private Methods
+
+    private void Rehash()
+    {
+        IsRehashing = true;
+        _bucketCount *= 2;
+        _data.Clear();
+        AddAll(_rehashList);
+
+        IsRehashing = false;
+    }
+
+    private void AddDataToBucket(SortedDictionary<TKey, (int, KeyIndex, List<TValue>)> bucket, int keyHash, TKey key, TValue value)
+    {
+        if (bucket.ContainsKey(key))
+        {
+            (int keyHash, KeyIndex keyIndex, List<TValue> values) bucketData = bucket[key];
+            bucketData.values.Add(value);
+        }
+        else
+        {
+            List<TValue> values = new List<TValue>();
+            values.Add(value);
+            bucket.Add(key, (keyHash, new KeyIndex() { KeyHash = keyHash }, values));
+        }
+    }
 
     private void SetTotalCount(ref BlobMultiHashMap<TKey, TValue> blobMap)
     {
@@ -172,4 +183,5 @@ public class BlobHashMapBuilder<TKey, TValue>
         ValueCount = valueCount;
     }
 
+    #endregion Private Methods
 }

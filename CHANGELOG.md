@@ -3,10 +3,13 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
-## [0.3.1] - 2021-06-28
+## [0.4.0] - 2022-03-16
 
-### Add 
-* Sonar Cloud config
+### Change 
+* Update to entities 0.50
+
+### Fix
+* Infinite loop in binary search is some cases
 
 ## [0.3.0] - 2021-06-28
 
