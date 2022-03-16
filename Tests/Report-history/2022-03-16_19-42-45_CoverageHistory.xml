@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2022-03-16_19-42-45" tag="">
+  <assembly name="WaynGames.Blob.Runtime">
+    <class name="BlobHashMapBucket[TKey,TValue]" coveredlines="69" coverablelines="99" totallines="169" coveredbranches="0" totalbranches="0" />
+    <class name="BlobHashMapBuilder[TKey,TValue]" coveredlines="117" coverablelines="117" totallines="175" coveredbranches="0" totalbranches="0" />
+    <class name="BlobHashMapUtils" coveredlines="9" coverablelines="9" totallines="41" coveredbranches="0" totalbranches="0" />
+    <class name="BlobMultiHashMap[TKey,TValue]" coveredlines="16" coverablelines="16" totallines="46" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>

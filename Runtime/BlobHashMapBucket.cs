@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
-
+using UnityEngine;
 
 internal struct BlobHashMapBucket<TKey, TValue>
     where TKey : struct, IEquatable<TKey>
@@ -92,6 +92,7 @@ internal struct BlobHashMapBucket<TKey, TValue>
                 }
             }
 
+            return -1;
         }
 
         return -1;
@@ -114,9 +115,36 @@ internal struct BlobHashMapBucket<TKey, TValue>
         int elementCount = KeyIndexes[keyIndex].ElementCount;
         int firstIndex = KeyIndexes[keyIndex].FirstIndex;
 
-        return GetReadOnlySubArray(firstIndex, elementCount); ;
+        return GetReadOnlySubArray(firstIndex, elementCount); 
     }
 
+
+    public NativeArray<TKey> GetKeys()
+    {
+        return GetReadOnlyKeysSubArray(0, ValuesArray.Length);
+    }
+    private NativeArray<TKey> GetReadOnlyKeysSubArray(int start, int length)
+    {
+        unsafe
+        {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle safety = AtomicSafetyHandle.GetTempMemoryHandle();
+            AtomicSafetyHandle.CheckGetSecondaryDataPointerAndThrow(safety);
+#endif
+            NativeArray<TKey> result = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<TKey>(((byte*)ValuesArray.GetUnsafePtr()) + ((long)UnsafeUtility.SizeOf<TKey>()) * start, length, Allocator.None);
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
+            AtomicSafetyHandle.CheckWriteAndBumpSecondaryVersion(safety);
+            AtomicSafetyHandle.UseSecondaryVersion(ref safety);
+            AtomicSafetyHandle.SetAllowSecondaryVersionWriting(safety, false);
+            NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref result, safety);
+#endif
+            return result;
+        }
+    }
+    public NativeArray<TValue> GetValues()
+    {
+        return GetReadOnlySubArray(0, ValuesArray.Length);
+    }
     private NativeArray<TValue> GetReadOnlySubArray(int start, int length)
     {
         unsafe
@@ -131,8 +159,6 @@ internal struct BlobHashMapBucket<TKey, TValue>
             AtomicSafetyHandle.UseSecondaryVersion(ref safety);
             AtomicSafetyHandle.SetAllowSecondaryVersionWriting(safety, false);
             NativeArrayUnsafeUtility.SetAtomicSafetyHandle(ref result, safety);
-
-
 #endif
             return result;
         }
