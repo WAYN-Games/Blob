@@ -19,11 +19,11 @@ public class BlobTests
 
     #region Public Methods
 
-    public static NativeMultiHashMap<TKey, TValue> GenerateData<TKey, TValue>(int size, TKey[] keys, TValue[] values, Allocator allocator = Allocator.Temp)
+    public static NativeParallelMultiHashMap<TKey, TValue> GenerateData<TKey, TValue>(int size, TKey[] keys, TValue[] values, Allocator allocator = Allocator.Temp)
         where TKey : struct, IEquatable<TKey>, IComparable<TKey>
         where TValue : struct
     {
-        NativeMultiHashMap<TKey, TValue> result = new NativeMultiHashMap<TKey, TValue>(size, allocator);
+        NativeParallelMultiHashMap<TKey, TValue> result = new NativeParallelMultiHashMap<TKey, TValue>(size, allocator);
 
         int2 min;
         min.x = 0;
@@ -70,7 +70,7 @@ public class BlobTests
     public void BlobMultiHashMapNonExistingKeyTest([Values(0, 10, 100, 1000)] int size)
     {
         if (!BurstCompiler.IsEnabled && size > 1000) return;
-        NativeMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset);
+        NativeParallelMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
             BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
@@ -84,7 +84,7 @@ public class BlobTests
     [Test]
     public void BlobMultiHashMapExistingKeyTest()
     {
-        NativeMultiHashMap<int, int> initialData = GenerateData(1, dataset, dataset);
+        NativeParallelMultiHashMap<int, int> initialData = GenerateData(1, dataset, dataset);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
             BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
@@ -101,7 +101,7 @@ public class BlobTests
     public void BlobMultiHashMapTest([Values(10, 100, 1000, 10000, 100000, 500000, 1000000)] int size)
     {
         if (!BurstCompiler.IsEnabled && size > 1000) return;
-        NativeMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset, Allocator.TempJob);
+        NativeParallelMultiHashMap<int, int> initialData = GenerateData(size, dataset, dataset, Allocator.TempJob);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
             BlobAssetReference<BlobMultiHashMap<int, int>> mapref = new BlobHashMapBuilder<int, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.TempJob);
@@ -109,8 +109,8 @@ public class BlobTests
 
             var uniqueKeys = initialData.GetUniqueKeyArray(Allocator.TempJob);
 
-            NativeHashMap<int, int> mapResults = new NativeHashMap<int, int>(uniqueKeys.Item2, Allocator.TempJob);
-            NativeHashMap<int, int> blobResults = new NativeHashMap<int, int>(uniqueKeys.Item2, Allocator.TempJob);
+            NativeParallelHashMap<int, int> mapResults = new NativeParallelHashMap<int, int>(uniqueKeys.Item2, Allocator.TempJob);
+            NativeParallelHashMap<int, int> blobResults = new NativeParallelHashMap<int, int>(uniqueKeys.Item2, Allocator.TempJob);
             NativeArray<int> ukeys = uniqueKeys.Item1.GetSubArray(0, uniqueKeys.Item2);
 
             var mapDep = new MapJob()
@@ -154,7 +154,7 @@ public class BlobTests
             keys.Add(new CollidingKey() { value = i });
         }
 
-        NativeMultiHashMap<CollidingKey, int> initialData = GenerateData(size, keys.ToArray(), dataset);
+        NativeParallelMultiHashMap<CollidingKey, int> initialData = GenerateData(size, keys.ToArray(), dataset);
         using (BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp))
         {
             BlobAssetReference<BlobMultiHashMap<CollidingKey, int>> mapref = new BlobHashMapBuilder<CollidingKey, int>(blobBuilder).AddAll(initialData.GetEnumerator()).CreateBlobAssetReference(Allocator.Temp);
@@ -171,7 +171,7 @@ public class BlobTests
 
     #region Private Methods
 
-    private void AssertForKey<TKey>(TKey key, NativeMultiHashMap<TKey, int> initialData, ref BlobMultiHashMap<TKey, int> map)
+    private void AssertForKey<TKey>(TKey key, NativeParallelMultiHashMap<TKey, int> initialData, ref BlobMultiHashMap<TKey, int> map)
          where TKey : struct, IEquatable<TKey>, IComparable<TKey>
     {
         var e = initialData.GetValuesForKey(key);
@@ -199,8 +199,8 @@ public class BlobTests
         #region Public Fields
 
         [ReadOnly] public NativeArray<int> Keys;
-        [ReadOnly] public NativeMultiHashMap<int, int> map;
-        public NativeHashMap<int, int>.ParallelWriter results;
+        [ReadOnly] public NativeParallelMultiHashMap<int, int> map;
+        public NativeParallelHashMap<int, int>.ParallelWriter results;
 
         #endregion Public Fields
 
@@ -229,7 +229,7 @@ public class BlobTests
 
         [ReadOnly] public NativeArray<int> Keys;
         [ReadOnly] public BlobAssetReference<BlobMultiHashMap<int, int>> mapref;
-        public NativeHashMap<int, int>.ParallelWriter results;
+        public NativeParallelHashMap<int, int>.ParallelWriter results;
 
         #endregion Public Fields
 
