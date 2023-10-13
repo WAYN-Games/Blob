@@ -15,7 +15,7 @@ jobs:
       matrix:
         projectPath:
           - wayn.games.blob
-        unityVersion: ['2022.3.11f1']
+        unityVersion: ['2022.3.10f1']
         testMode:
           - playmode
           - editmode
