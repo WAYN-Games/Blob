@@ -21,7 +21,7 @@ jobs:
           - playmode
           - editmode
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           lfs: true
       - uses: game-ci/unity-test-runner@v3
