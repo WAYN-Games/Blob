@@ -13,7 +13,7 @@ jobs:
         id: requestActivationFile
         uses: game-ci/unity-request-activation-file@v2.0-alpha-1
         with:
-          unityVersion: '2022.3.9f1'
+          unityVersion: '2022.3.0f1'
       - name: Upload activation file
         uses: actions/upload-artifact@v2
         with:
