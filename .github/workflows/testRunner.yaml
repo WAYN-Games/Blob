@@ -37,6 +37,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: ${{ matrix.testMode }} Test Results
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport;assemblyFilters:+WaynGames.*'
+          coveragePath: ${{ matrix.testMode }}-coverage
       - uses: actions/upload-artifact@v2
         if: always()
         with:
