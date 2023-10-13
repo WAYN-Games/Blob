@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         projectPath:
-          - unity-package-with-correct-tests/com.example.testpackage
+          - ./
         unityVersion:
           - 2022.3.7f1
     steps:
