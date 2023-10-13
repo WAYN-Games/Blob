@@ -16,6 +16,6 @@ jobs:
      - uses: game-ci/unity-test-runner@v3
        with:
           packageMode: true
-          projectPath: .
+          projectPath: Blob
           githubToken: ${{ secrets.GITHUB_TOKEN }}        
           unityVersion: 2022.3.7f1
