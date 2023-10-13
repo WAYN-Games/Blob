@@ -18,4 +18,4 @@ jobs:
           packageMode: true
           projectPath: packageRoot
           githubToken: ${{ secrets.GITHUB_TOKEN }}        
-          unityVersion: 2022.3.7f1
+          unityVersion: 2022.3.11f1
