@@ -1,4 +1,4 @@
-name: GameCI Template 🎮
+name: Check for the Unity license
 
 on: workflow_dispatch
 
