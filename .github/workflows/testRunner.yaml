@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-     - uses: game-ci/unity-test-runner@v2
+     - uses: game-ci/unity-test-runner@v3
        with:
           packageMode: true
           projectPath: wayn.games.blob
