@@ -20,8 +20,8 @@ public class BlobTests
     #region Public Methods
 
     public static NativeParallelMultiHashMap<TKey, TValue> GenerateData<TKey, TValue>(int size, TKey[] keys, TValue[] values, Allocator allocator = Allocator.Temp)
-        where TKey : struct, IEquatable<TKey>, IComparable<TKey>
-        where TValue : struct
+        where TKey : unmanaged, IEquatable<TKey>, IComparable<TKey>
+        where TValue : unmanaged
     {
         NativeParallelMultiHashMap<TKey, TValue> result = new NativeParallelMultiHashMap<TKey, TValue>(size, allocator);
 
@@ -172,7 +172,7 @@ public class BlobTests
     #region Private Methods
 
     private void AssertForKey<TKey>(TKey key, NativeParallelMultiHashMap<TKey, int> initialData, ref BlobMultiHashMap<TKey, int> map)
-         where TKey : struct, IEquatable<TKey>, IComparable<TKey>
+         where TKey : unmanaged, IEquatable<TKey>, IComparable<TKey>
     {
         var e = initialData.GetValuesForKey(key);
         int intialValue = 0;

@@ -6,8 +6,8 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
 public class BlobHashMapBuilder<TKey, TValue>
-    where TKey : struct, IEquatable<TKey>, IComparable<TKey>
-    where TValue : struct
+    where TKey : unmanaged, IEquatable<TKey>, IComparable<TKey>
+    where TValue : unmanaged
 {
     #region Private Fields
 
