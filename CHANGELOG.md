@@ -3,7 +3,13 @@ All notable changes to this package will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+## [1.0.0] - 2023-10-15
 
+### Change 
+* Update to entities 1.0.16
+  * This is now a requirement for the package to work without having to manually and locally edit the entities package
+
+  
 ## [0.5.0] - 2022-07-01
 
 ### Change 
