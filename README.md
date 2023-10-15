@@ -24,7 +24,7 @@ This package provides an implmeentaion of a Blob Map that allows fast access to 
 # Limitations
 * #N.A
 # Workflows
-* see [Samples](.#Samples)
+* see [Samples](#Samples)
 # Advanced topics
 * #N.A
 # Reference
