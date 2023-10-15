@@ -15,20 +15,21 @@ Repository of additional unity BlobAsset
 This package provides an implmeentaion of a Blob Map that allows fast access to read only data from its key.
 
 # Package contents
-
+* N/A
 # Installation instructions
-
+* Import the package via the package manager (see :  [Package Manager installation instructions](https://docs.unity3d.com/Manual/upm-ui-actions.html)
+  * Add package from git URL : Use the following URL https://github.com/WAYN-Games/Blob.git?path=/games.wayn.blob 
 # Requirements
 * com.unity.entities 1.0.16
 * Unity 2022 LTS
 # Limitations
-* #N.A
+* N/A
 # Workflows
 * see [Samples](#Samples)
 # Advanced topics
-* #N.A
+* N/A
 # Reference
-* #N.A
+* N/A
 # Samples
 
 ```cs
