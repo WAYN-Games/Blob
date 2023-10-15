@@ -1,4 +1,4 @@
-# Blob
+# Blob [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 Repository of additional unity BlobAsset
 
 # Quality ![](https://github.com/WAYN-Games/Blob/blob/main/Documentation~/badge_linecoverage.png)  
