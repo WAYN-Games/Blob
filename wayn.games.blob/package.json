@@ -1,12 +1,12 @@
 {
-  "name": "com.wayn-games.blob",
-  "displayName": "WAYN Blob",
+  "name": "games.wayn.blob",
+  "displayName": "WAYN Games Blob",
   "version": "1.0.0",
   "unity": "2022.3",
   "author": {
     "name": "WAYN Games"
   },
-  "description": "This package contains additionnal blob structure for use in DOTS projects.",
+  "description": "This package contains additionnal blob structures for use in Unity DOTS projects.",
   "dependencies": {
     "com.unity.entities": "1.0.16"
   }
