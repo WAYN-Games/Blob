@@ -8,7 +8,7 @@ Repository of additional unity BlobAsset
 # Documentation :
 
 
-[![openupm](https://img.shields.io/npm/v/com.wayn-games.blob?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.wayn-games.blob/)
+[![openupm](https://img.shields.io/npm/v/com.wayn-games.blob?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/games.wayn.blob/)
 
 # Overview
 
