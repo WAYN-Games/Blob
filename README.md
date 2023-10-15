@@ -1,13 +1,36 @@
 # Blob
 Repository of additional unity BlobAsset
 
-# Quality
+# Quality ![](https://github.com/WAYN-Games/Blob/blob/main/Documentation~/badge_linecoverage.png)  
 
-![](https://github.com/WAYN-Games/Blob/blob/main/Tests/Report/badge_linecoverage.png)  
+![](https://github.com/WAYN-Games/Blob/blob/main/Documentation~/tests_coverage_report.png)  
+
+# Documentation :
+
 
 [![openupm](https://img.shields.io/npm/v/com.wayn-games.blob?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.wayn-games.blob/)
 
-# Exemple :
+# Overview
+
+This package provides an implmeentaion of a Blob Map that allows fast access to read only data from its key.
+
+# Package contents
+
+# Installation instructions
+
+# Requirements
+* com.unity.entities 1.0.16
+* Unity 2022 LTS
+# Limitations
+* #N.A
+# Workflows
+* see [Samples](.#Samples)
+# Advanced topics
+* #N.A
+# Reference
+* #N.A
+# Samples
+
 ```cs
 	[Test]
     public void SimpleExempleTest()
@@ -34,3 +57,5 @@ Repository of additional unity BlobAsset
         }
     }
 ```
+
+# Tutorials
